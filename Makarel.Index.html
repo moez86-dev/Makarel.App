@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>مكاريل 🐟 — طلبية سكن الشركة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --sea-deep:#082226;
+    --sea:#0F3339;
+    --sea-2:#134650;
+    --paper:#FBF4E4;
+    --ink:#1E2A25;
+    --ink-soft:#5B6A63;
+    --coral:#E6642F;
+    --coral-deep:#C24E1F;
+    --gold:#E7B24C;
+    --teal:#3E9086;
+    --red:#C0392B;
+    --line: rgba(251,244,228,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Cairo', sans-serif;
+    color:var(--paper);
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 10% 0%, rgba(62,144,134,0.25), transparent 45%),
+      radial-gradient(ellipse at 90% 15%, rgba(230,100,47,0.18), transparent 40%),
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0 2px, transparent 2px 42px),
+      linear-gradient(180deg, var(--sea-deep), var(--sea));
+    padding-bottom:50px;
+  }
+  .wrap{max-width:700px; margin:0 auto; padding:20px 14px 0;}
+  .brand-font{font-family:'Tajawal', sans-serif;}
+
+  /* Header */
+  .navbar-fish{
+    background:linear-gradient(135deg, var(--coral), var(--coral-deep));
+    border-radius:18px; padding:16px 20px; box-shadow:0 14px 30px rgba(0,0,0,.3);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand .fish-icn{font-size:26px;}
+  .brand-title{font-weight:900; font-size:22px; margin:0;}
+  .brand-sub{font-size:12.5px; opacity:.92; margin:0;}
+  .scale-divider{height:12px; margin:14px 0 2px; opacity:.4;
+    background-image: radial-gradient(circle at 6px 0, transparent 6px, var(--gold) 7px, transparent 8px);
+    background-size: 14px 14px; background-repeat: repeat-x; background-position: bottom;
+  }
+
+  .status-card{
+    background:var(--sea-2); border:1px solid var(--line); border-radius:16px;
+    padding:12px 16px; margin-top:14px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    flex-wrap:wrap;
+  }
+  .badge-status{font-family:'Tajawal',sans-serif; font-weight:700; font-size:12.5px; padding:7px 12px; border-radius:999px;}
+  .badge-status.open{background:rgba(62,144,134,.22); color:#8FD9CC; border:1px solid rgba(62,144,134,.5);}
+  .badge-status.locked{background:rgba(192,57,43,.2); color:#F0A599; border:1px solid rgba(192,57,43,.5);}
+  .status-date{font-size:13px; color:#C7D8D3;}
+  .btn-fish{font-family:'Tajawal',sans-serif; font-weight:700; border-radius:11px;}
+  .btn-coral{background:var(--coral); border:none; color:#fff;}
+  .btn-coral:hover{background:var(--coral-deep); color:#fff;}
+  .btn-outline-paper{border:1px solid var(--paper); color:var(--paper); background:transparent;}
+  .btn-outline-paper:hover{background:var(--paper); color:var(--ink);}
+
+  .card-fish{
+    background:var(--paper); color:var(--ink); border-radius:20px; padding:20px;
+    margin-top:16px; box-shadow:0 14px 30px rgba(0,0,0,.25); border:none;
+  }
+  .card-fish h2{font-family:'Tajawal',sans-serif; font-weight:800; font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px;}
+  .card-fish h2 i{color:var(--coral);}
+  .card-fish p.hint{color:var(--ink-soft); font-size:13px; margin:0 0 14px;}
+
+  .form-label{font-family:'Tajawal',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft);}
+  .form-control, .form-select{
+    border-radius:11px; border:1.5px solid #E3D7BB; font-size:15px; padding:10px 13px;
+  }
+  .form-control:focus, .form-select:focus{border-color:var(--coral); box-shadow:0 0 0 .2rem rgba(230,100,47,.15);}
+
+  .chip-group{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{padding:8px 14px; border-radius:999px; border:1.5px solid #E3D7BB; background:#fff; font-size:13.5px; cursor:pointer;}
+  .chip.active{background:var(--coral); border-color:var(--coral); color:#fff; font-weight:700;}
+
+  .stepper{display:flex; align-items:center; gap:10px;}
+  .stepper button{width:36px; height:36px; border-radius:10px; border:1.5px solid #E3D7BB; background:#fff; font-size:17px;}
+  .stepper span{min-width:24px; text-align:center; font-weight:700;}
+
+  .form-switch .form-check-input{width:2.6em; height:1.4em;}
+  .form-switch .form-check-input:checked{background-color:var(--teal); border-color:var(--teal);}
+
+  .price-preview{
+    background:#FFF7E8; border:1.5px dashed var(--gold); border-radius:13px; padding:12px 14px;
+    display:flex; align-items:center; justify-content:space-between; margin:14px 0;
+    font-family:'Tajawal',sans-serif; font-weight:700;
+  }
+  .price-preview .amt{color:var(--coral-deep); font-size:19px;}
+
+  .roster-chip{
+    display:inline-flex; align-items:center; gap:6px; background:#fff; border:1.5px solid #E3D7BB;
+    border-radius:999px; padding:5px 6px 5px 12px; font-size:13px; margin:3px;
+  }
+  .roster-chip .rm{border:none; background:#F3E4E1; color:var(--red); border-radius:50%; width:20px; height:20px; font-size:11px; cursor:pointer;}
+
+  .apt-title{font-family:'Tajawal',sans-serif; font-weight:800; font-size:13.5px; color:var(--ink-soft);
+    display:flex; align-items:center; gap:8px; margin:14px 0 8px;}
+  .apt-title .dot{width:8px; height:8px; border-radius:50%; background:var(--teal);}
+  .order-item{
+    background:#fff; border:1.5px solid #EFE6CE; border-radius:14px; padding:12px 13px; margin-bottom:8px;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+  }
+  .order-item .who{font-family:'Tajawal',sans-serif; font-weight:800; font-size:14.5px;}
+  .order-item .what{font-size:12.5px; color:var(--ink-soft); margin-top:3px; line-height:1.6;}
+  .order-item .price{font-family:'Tajawal',sans-serif; font-weight:800; color:var(--coral-deep); font-size:13.5px; margin-top:4px;}
+  .order-actions{display:flex; flex-direction:column; align-items:center; gap:6px; flex:none;}
+  .paid-btn{font-family:'Tajawal',sans-serif; font-weight:700; font-size:11px; border-radius:999px; padding:4px 10px; border:none; cursor:pointer;}
+  .paid-btn.no{background:#F3E4E1; color:var(--red);}
+  .paid-btn.yes{background:rgba(62,144,134,.18); color:#2E7268; border:1px solid rgba(62,144,134,.4);}
+  .del-btn{border:none; background:transparent; color:#C7B99A; cursor:pointer;}
+  .del-btn:hover{color:var(--red);}
+  .empty{color:var(--ink-soft); font-size:13px; text-align:center; padding:18px 10px;}
+
+  .board{background:var(--sea-2); border:1px solid var(--line); border-radius:20px; padding:20px; margin-top:16px;}
+  .board h2{font-family:'Tajawal',sans-serif; font-weight:800; font-size:17px; margin:0 0 12px; display:flex; align-items:center; gap:8px;}
+  .board h2 i{color:var(--gold);}
+  .tally-row{display:flex; align-items:center; justify-content:space-between; padding:9px 12px;
+    background:rgba(251,244,228,.06); border-radius:11px; margin-bottom:8px; font-size:13.5px;}
+  .tally-count{font-family:'Tajawal',sans-serif; font-weight:800; background:rgba(230,100,47,.28);
+    border:1px solid rgba(230,100,47,.5); border-radius:8px; padding:2px 10px;}
+  .fin-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:14px;}
+  .fin-box{background:rgba(251,244,228,.06); border:1px solid var(--line); border-radius:12px; padding:12px 8px; text-align:center;}
+  .fin-box .lbl{font-size:11.5px; color:#BFD3CD;}
+  .fin-box .val{font-family:'Tajawal',sans-serif; font-weight:800; font-size:16px; margin-top:4px;}
+  .fin-box.due .val{color:#F0A599;}
+  .fin-box.paid .val{color:#8FD9CC;}
+  .fin-box.total .val{color:var(--gold);}
+
+  .history-toggle{display:flex; align-items:center; gap:8px; justify-content:center; margin-top:18px;
+    color:#BFD3CD; font-size:13.5px; cursor:pointer; font-family:'Tajawal',sans-serif; font-weight:700;}
+  #historyPanel{display:none; margin-top:10px;}
+  #historyPanel.show{display:block;}
+  .hist-item{background:var(--sea-2); border:1px solid var(--line); border-radius:14px; padding:11px 14px; margin-bottom:8px; font-size:12.5px; color:#C7D8D3;}
+  .hist-item b{color:var(--paper); font-family:'Tajawal';}
+
+  .link-row{margin-top:18px; display:flex; gap:8px; align-items:center; background:var(--sea-2);
+    border:1px solid var(--line); border-radius:14px; padding:10px 12px;}
+  .link-row input{flex:1; background:transparent; border:none; color:#BFD3CD; font-size:12px; direction:ltr; text-align:right; outline:none;}
+
+  .toast-fish{position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--paper); padding:11px 20px; border-radius:999px; font-size:13.5px;
+    font-family:'Tajawal'; font-weight:700; opacity:0; transition:.25s; pointer-events:none; z-index:60;}
+  .toast-fish.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  footer{text-align:center; color:#6E8680; font-size:11.5px; margin-top:24px;}
+  .import-zone{border:1.5px dashed #E3D7BB; border-radius:13px; padding:14px; text-align:center; background:#FFF9EE;}
+  .import-zone i{font-size:22px; color:var(--coral);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="navbar-fish">
+    <div class="brand">
+      <span class="fish-icn">🐟</span>
+      <div>
+        <p class="brand-title brand-font">مكاريل</p>
+        <p class="brand-sub">سكن الشركة – الشقّتان · طلبية الجمعة</p>
+      </div>
+    </div>
+    <i class="bi bi-water" style="font-size:24px; opacity:.85;"></i>
+  </div>
+  <div class="scale-divider"></div>
+
+  <div class="status-card">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <span id="statusBadge" class="badge-status open">مفتوح للطلب</span>
+      <span class="status-date">طلبية <b id="fridayLabel" style="color:var(--paper)">—</b></span>
+    </div>
+    <button id="lockBtn" class="btn btn-fish btn-outline-paper btn-sm"><i class="bi bi-lock"></i> قفل الطلب</button>
+  </div>
+
+  <!-- Roster management -->
+  <section class="card-fish">
+    <h2><i class="bi bi-people-fill"></i> إدارة الأشخاص</h2>
+    <p class="hint">أضف سكان الشقتين يدويًا أو استورد الأسماء من ملف إكسيل (عمود الاسم، وعمود الشقة اختياري)</p>
+
+    <div class="row g-2 mb-3">
+      <div class="col-6"><input type="text" class="form-control" id="rosterName" placeholder="اسم الشخص"></div>
+      <div class="col-4">
+        <select class="form-select" id="rosterApt">
+          <option value="شقة 1">شقة 1</option>
+          <option value="شقة 2">شقة 2</option>
+        </select>
+      </div>
+      <div class="col-2"><button class="btn btn-coral btn-fish w-100" id="rosterAddBtn"><i class="bi bi-plus-lg"></i></button></div>
+    </div>
+
+    <div class="import-zone mb-3">
+      <i class="bi bi-file-earmark-spreadsheet d-block mb-1"></i>
+      <label for="excelInput" style="cursor:pointer; font-family:'Tajawal'; font-weight:700; font-size:13.5px;">
+        استيراد أسماء من ملف إكسيل
+      </label>
+      <div style="font-size:11.5px; color:var(--ink-soft); margin-top:2px;">عمود A: الاسم — عمود B: الشقة (اختياري)</div>
+      <input type="file" id="excelInput" accept=".xlsx,.xls,.csv" hidden>
+    </div>
+
+    <div id="rosterList"></div>
+  </section>
+
+  <!-- Add order -->
+  <section class="card-fish" id="formCard">
+    <h2><i class="bi bi-basket2-fill"></i> إضافة طلبك</h2>
+    <p class="hint">اكتب اسمك واختار طلبك، والسعر بيتحسب لوحده</p>
+
+    <div class="mb-3">
+      <label class="form-label">اسمك</label>
+      <input type="text" class="form-control" id="nameInput" list="namesList" placeholder="اختار اسمك أو اكتبه">
+      <datalist id="namesList"></datalist>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label d-block mb-2">الشقة</label>
+      <div class="chip-group" id="aptChips">
+        <div class="chip active" data-val="شقة 1">شقة 1</div>
+        <div class="chip" data-val="شقة 2">شقة 2</div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">نوع السمك (20 ريال)</label>
+      <select class="form-select" id="fishSelect">
+        <option>بوري مشوي</option>
+        <option>بلطي مشوي</option>
+        <option>بلطي سنجاري</option>
+        <option>مكاريل سنجاري</option>
+        <option>بلطي مقلي</option>
+      </select>
+    </div>
+
+    <div class="row g-2 mb-3">
+      <div class="col-6">
+        <label class="form-label">طبق الرز</label>
+        <select class="form-select" id="riceSelect">
+          <option value="بدون">بدون</option>
+          <option value="صغير">صغير — 5 ريال</option>
+          <option value="كبير">كبير — 7 ريال</option>
+        </select>
+      </div>
+      <div class="col-6">
+        <label class="form-label d-block">عدد أرغفة العيش (1 ريال / رغيف)</label>
+        <div class="stepper">
+          <button type="button" id="breadMinus">−</button>
+          <span id="breadCount">2</span>
+          <button type="button" id="breadPlus">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-check form-switch mb-3 ps-0">
+      <div class="d-flex align-items-center justify-content-between border rounded-3 p-2 px-3" style="border-color:#E3D7BB!important;">
+        <span style="font-size:14px;">طبق طحينة (2.5 ريال)</span>
+        <input class="form-check-input ms-0" type="checkbox" id="tehinaCheck" style="float:none;">
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">ملاحظات (اختياري)</label>
+      <input type="text" class="form-control" id="noteInput" placeholder="مثلاً: من غير فلفل حار">
+    </div>
+
+    <div class="price-preview">
+      <span>إجمالي طلبك</span>
+      <span class="amt"><span id="pricePreview">27.5</span> ريال</span>
+    </div>
+
+    <button class="btn btn-coral btn-fish w-100 py-2" id="addBtn"><i class="bi bi-send-fill"></i> إضافة الطلب</button>
+  </section>
+
+  <!-- Orders list -->
+  <section class="card-fish">
+    <h2><i class="bi bi-list-check"></i> طلبات الأسبوع</h2>
+    <p class="hint">مقسّمة حسب الشقة — دوس على "لسه" عشان تسجّل السداد</p>
+    <div id="ordersContainer"></div>
+  </section>
+
+  <!-- Summary -->
+  <section class="board">
+    <h2><i class="bi bi-clipboard-data-fill"></i> قايمة الشراء والحساب</h2>
+    <div id="tallyList"></div>
+    <div class="fin-grid">
+      <div class="fin-box total"><div class="lbl">الإجمالي</div><div class="val" id="finTotal">0</div></div>
+      <div class="fin-box paid"><div class="lbl">المحصّل</div><div class="val" id="finPaid">0</div></div>
+      <div class="fin-box due"><div class="lbl">المتبقي</div><div class="val" id="finDue">0</div></div>
+    </div>
+  </section>
+
+  <div class="history-toggle" id="historyToggle">
+    الطلبات السابقة <i class="bi bi-chevron-down"></i>
+  </div>
+  <div id="historyPanel"></div>
+
+  <div class="link-row">
+    <input type="text" id="linkField" readonly>
+    <button class="btn btn-fish btn-sm" style="background:var(--paper); color:var(--ink);" id="copyBtn"><i class="bi bi-link-45deg"></i> نسخ اللينك</button>
+  </div>
+
+  <footer>شارك اللينك ده في جروب "مكاريل" على الواتس — كل حد يفتحه يشوف نفس الطلبية والحساب لحظة بلحظة</footer>
+</div>
+
+<div class="toast-fish" id="toast"></div>
+
+<script>
+(function(){
+  const FISH_LIST = ["بوري مشوي","بلطي مشوي","بلطي سنجاري","مكاريل سنجاري","بلطي مقلي"];
+  const PRICE = { fish:20, rice:{"بدون":0,"صغير":5,"كبير":7}, tehina:2.5, bread:1 };
+
+  let currentApt = "شقة 1";
+  let breadCount = 2;
+  let currentKey = "";
+  let currentData = { locked:false, items:[] };
+  let roster = [];
+  let pollTimer = null;
+
+  const $ = (id) => document.getElementById(id);
+  const toast = (msg) => {
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 2200);
+  };
+  const escapeHtml = (s) => (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const money = (n) => (Math.round(n*100)/100).toString();
+
+  function fridayKeyForOffset(weekOffset){
+    const d = new Date(); d.setHours(0,0,0,0);
+    const day = d.getDay();
+    let diff = (5 - day + 7) % 7;
+    d.setDate(d.getDate() + diff + (weekOffset*7));
+    return d.toISOString().slice(0,10);
+  }
+  function formatArabicDate(iso){
+    const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+    const [y,m,dd] = iso.split("-").map(Number);
+    return `${dd} ${months[m-1]} ${y}`;
+  }
+  function calcPrice(fish, rice, tehina, bread){
+    return PRICE.fish + (PRICE.rice[rice]||0) + (tehina?PRICE.tehina:0) + (bread*PRICE.bread);
+  }
+
+  // ---------- roster ----------
+  async function loadRoster(){
+    try{
+      const res = await window.storage.get("roster", true);
+      roster = res ? JSON.parse(res.value) : [];
+    }catch(e){ roster = []; }
+    renderRoster();
+  }
+  async function saveRoster(){
+    try{ await window.storage.set("roster", JSON.stringify(roster), true); }
+    catch(e){ toast("حصل خطأ في حفظ الأسماء"); }
+  }
+  function renderRoster(){
+    const nameList = $("namesList");
+    nameList.innerHTML = roster.map(p => `<option value="${escapeHtml(p.name)}">`).join("");
+
+    const listEl = $("rosterList");
+    if(roster.length === 0){
+      listEl.innerHTML = `<div class="empty">لسه مفيش أسماء مسجّلة</div>`;
+      return;
+    }
+    listEl.innerHTML = roster.map(p => `
+      <span class="roster-chip">
+        ${escapeHtml(p.name)} <small style="color:var(--ink-soft)">· ${p.apt}</small>
+        <button class="rm" data-id="${p.id}" title="حذف">×</button>
+      </span>`).join("");
+    listEl.querySelectorAll(".rm").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        roster = roster.filter(p => p.id !== btn.dataset.id);
+        await saveRoster(); renderRoster();
+      });
+    });
+  }
+  async function addRosterPerson(name, apt){
+    name = name.trim();
+    if(!name) return;
+    if(roster.some(p => p.name === name)) return;
+    roster.push({ id:(crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random())), name, apt });
+    await saveRoster(); renderRoster();
+  }
+
+  $("rosterAddBtn").addEventListener("click", async ()=>{
+    const name = $("rosterName").value.trim();
+    if(!name){ toast("اكتب اسم الأول"); return; }
+    await addRosterPerson(name, $("rosterApt").value);
+    $("rosterName").value = "";
+    toast("اتضاف " + name);
+  });
+
+  $("excelInput").addEventListener("change", async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, {type:"array"});
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, {header:1});
+      let added = 0;
+      for(const row of rows){
+        const name = (row[0] || "").toString().trim();
+        if(!name) continue;
+        if(["الاسم","اسم","name","Name"].includes(name)) continue;
+        let apt = (row[1] || "").toString().trim();
+        if(apt !== "شقة 1" && apt !== "شقة 2") apt = "شقة 1";
+        if(!roster.some(p => p.name === name)){
+          roster.push({ id:(crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()+added)), name, apt });
+          added++;
+        }
+      }
+      await saveRoster(); renderRoster();
+      toast(added > 0 ? `اتضاف ${added} اسم من الملف` : "مفيش أسماء جديدة في الملف");
+    }catch(err){
+      toast("مقدرش أقرأ الملف، تأكد إنه إكسيل سليم");
+    }
+    e.target.value = "";
+  });
+
+  // ---------- orders ----------
+  async function loadOrders(){
+    currentKey = fridayKeyForOffset(0);
+    $("fridayLabel").textContent = formatArabicDate(currentKey);
+    try{
+      const res = await window.storage.get(`order:${currentKey}`, true);
+      currentData = res ? JSON.parse(res.value) : { locked:false, items:[] };
+    }catch(e){ currentData = { locked:false, items:[] }; }
+    render();
+  }
+  async function saveOrders(){
+    try{ await window.storage.set(`order:${currentKey}`, JSON.stringify(currentData), true); }
+    catch(e){ toast("حصل خطأ في الحفظ، حاول تاني"); }
+  }
+
+  function render(){
+    const locked = currentData.locked;
+    const badge = $("statusBadge");
+    badge.textContent = locked ? "الطلب مقفول ✅" : "مفتوح للطلب";
+    badge.className = "badge-status " + (locked ? "locked" : "open");
+    $("lockBtn").innerHTML = locked ? '<i class="bi bi-unlock"></i> فتح الطلب تاني' : '<i class="bi bi-lock"></i> قفل الطلب';
+    $("formCard").style.display = locked ? "none" : "block";
+
+    const items = currentData.items || [];
+    const groups = {"شقة 1":[], "شقة 2":[]};
+    items.forEach(it => (groups[it.apt] || (groups[it.apt]=[])).push(it));
+
+    let html = "";
+    Object.keys(groups).forEach(apt=>{
+      const list = groups[apt];
+      html += `<div><div class="apt-title"><span class="dot"></span>${apt} (${list.length})</div>`;
+      if(list.length === 0){
+        html += `<div class="empty">لسه محدش طلب من ${apt}</div>`;
+      } else {
+        list.forEach(it=>{
+          const parts = [it.fish];
+          if(it.rice && it.rice !== "بدون") parts.push("رز " + it.rice);
+          if(it.tehina) parts.push("طحينة");
+          if(it.bread > 0) parts.push(it.bread + " عيش");
+          html += `<div class="order-item">
+            <div>
+              <div class="who">${escapeHtml(it.name)}</div>
+              <div class="what">${parts.join(" · ")}</div>
+              ${it.note ? `<div class="what" style="color:var(--coral-deep)">${escapeHtml(it.note)}</div>` : ""}
+              <div class="price">${money(it.total)} ريال</div>
+            </div>
+            <div class="order-actions">
+              <button class="paid-btn ${it.paid ? 'yes':'no'}" data-id="${it.id}" data-act="paid">${it.paid ? 'اتسدد ✓' : 'لسه'}</button>
+              <button class="del-btn" data-id="${it.id}" data-act="del" title="حذف"><i class="bi bi-trash3"></i></button>
+            </div>
+          </div>`;
+        });
+      }
+      html += `</div>`;
+    });
+    $("ordersContainer").innerHTML = html || `<div class="empty">لسه مفيش طلبات</div>`;
+
+    $("ordersContainer").querySelectorAll("[data-act='del']").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        currentData.items = currentData.items.filter(i => i.id !== btn.dataset.id);
+        await saveOrders(); render();
+      });
+    });
+    $("ordersContainer").querySelectorAll("[data-act='paid']").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const it = currentData.items.find(i => i.id === btn.dataset.id);
+        if(it){ it.paid = !it.paid; await saveOrders(); render(); }
+      });
+    });
+
+    // tally + finance
+    const tally = {}; FISH_LIST.forEach(f => tally[f]=0);
+    let rice_s=0, rice_l=0, tehina=0, bread=0, total=0, paid=0;
+    items.forEach(it=>{
+      tally[it.fish] = (tally[it.fish]||0)+1;
+      if(it.rice === "صغير") rice_s++;
+      if(it.rice === "كبير") rice_l++;
+      if(it.tehina) tehina++;
+      bread += (it.bread||0);
+      total += it.total || 0;
+      if(it.paid) paid += it.total || 0;
+    });
+    let rows = "";
+    FISH_LIST.forEach(f => { if(tally[f]>0) rows += tallyRow(f, tally[f]); });
+    if(rice_s>0) rows += tallyRow("رز صغير", rice_s);
+    if(rice_l>0) rows += tallyRow("رز كبير", rice_l);
+    if(tehina>0) rows += tallyRow("طبق طحينة", tehina);
+    if(bread>0) rows += tallyRow("أرغفة عيش", bread);
+    $("tallyList").innerHTML = rows || `<div class="empty" style="color:#9FB3AD;">لسه مفيش طلبات نلخصها</div>`;
+    $("finTotal").textContent = money(total) + " ريال";
+    $("finPaid").textContent = money(paid) + " ريال";
+    $("finDue").textContent = money(total-paid) + " ريال";
+
+    $("linkField").value = window.location.href;
+    updatePricePreview();
+  }
+  function tallyRow(name, count){
+    return `<div class="tally-row"><span>${name}</span><span class="tally-count">${count}</span></div>`;
+  }
+
+  function updatePricePreview(){
+    const price = calcPrice($("fishSelect").value, $("riceSelect").value, $("tehinaCheck").checked, breadCount);
+    $("pricePreview").textContent = money(price);
+  }
+
+  // ---------- interactions ----------
+  $("aptChips").addEventListener("click", (e)=>{
+    const chip = e.target.closest(".chip");
+    if(!chip) return;
+    document.querySelectorAll("#aptChips .chip").forEach(c=>c.classList.remove("active"));
+    chip.classList.add("active");
+    currentApt = chip.dataset.val;
+  });
+  $("breadMinus").addEventListener("click", ()=>{ breadCount = Math.max(0, breadCount-1); $("breadCount").textContent = breadCount; updatePricePreview(); });
+  $("breadPlus").addEventListener("click", ()=>{ breadCount = Math.min(10, breadCount+1); $("breadCount").textContent = breadCount; updatePricePreview(); });
+  $("fishSelect").addEventListener("change", updatePricePreview);
+  $("riceSelect").addEventListener("change", updatePricePreview);
+  $("tehinaCheck").addEventListener("change", updatePricePreview);
+
+  $("nameInput").addEventListener("change", ()=>{
+    const match = roster.find(p => p.name === $("nameInput").value.trim());
+    if(match){
+      currentApt = match.apt;
+      document.querySelectorAll("#aptChips .chip").forEach(c=>{
+        c.classList.toggle("active", c.dataset.val === match.apt);
+      });
+    }
+  });
+
+  $("addBtn").addEventListener("click", async ()=>{
+    const name = $("nameInput").value.trim();
+    if(!name){ toast("اكتب اسمك الأول"); $("nameInput").focus(); return; }
+    const fish = $("fishSelect").value;
+    const rice = $("riceSelect").value;
+    const tehina = $("tehinaCheck").checked;
+    const total = calcPrice(fish, rice, tehina, breadCount);
+    const item = {
+      id:(crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random())),
+      name, apt: currentApt, fish, rice, tehina, bread: breadCount,
+      note: $("noteInput").value.trim(), total, paid:false, ts: Date.now()
+    };
+    currentData.items = currentData.items || [];
+    currentData.items.push(item);
+    await saveOrders();
+    if(!roster.some(p => p.name === name)) await addRosterPerson(name, currentApt);
+    render();
+    toast("اتضاف طلبك ✅");
+    $("nameInput").value = ""; $("noteInput").value = ""; $("tehinaCheck").checked = false;
+    breadCount = 2; $("breadCount").textContent = breadCount;
+    updatePricePreview();
+  });
+
+  $("lockBtn").addEventListener("click", async ()=>{
+    currentData.locked = !currentData.locked;
+    await saveOrders(); render();
+    toast(currentData.locked ? "اتقفل الطلب" : "اتفتح الطلب تاني");
+  });
+
+  $("copyBtn").addEventListener("click", async ()=>{
+    try{ await navigator.clipboard.writeText(window.location.href); toast("اتنسخ اللينك 👍"); }
+    catch(e){ $("linkField").select(); toast("انسخه يدوي من الحقل"); }
+  });
+
+  let historyOpen = false;
+  $("historyToggle").addEventListener("click", async ()=>{
+    historyOpen = !historyOpen;
+    $("historyPanel").classList.toggle("show", historyOpen);
+    if(historyOpen){
+      const panel = $("historyPanel");
+      panel.innerHTML = `<div class="empty" style="color:#9FB3AD;">بيحمّل...</div>`;
+      let html = "";
+      for(let w=1; w<=3; w++){
+        const key = fridayKeyForOffset(-w);
+        try{
+          const res = await window.storage.get(`order:${key}`, true);
+          const data = res ? JSON.parse(res.value) : null;
+          const list = data && data.items ? data.items : [];
+          const total = list.reduce((s,i)=>s+(i.total||0),0);
+          html += `<div class="hist-item"><b>${formatArabicDate(key)}</b> — ${list.length > 0 ? list.length + " طلب · " + money(total) + " ريال" : "مفيش طلبات"}</div>`;
+        }catch(e){
+          html += `<div class="hist-item"><b>${formatArabicDate(key)}</b> — مفيش بيانات</div>`;
+        }
+      }
+      panel.innerHTML = html;
+    }
+  });
+
+  function startPolling(){
+    if(pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(async ()=>{
+      const activeEl = document.activeElement;
+      const isTyping = activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "SELECT");
+      if(isTyping) return;
+      const freshKey = fridayKeyForOffset(0);
+      if(freshKey !== currentKey){ loadOrders(); return; }
+      try{
+        const res = await window.storage.get(`order:${currentKey}`, true);
+        const fresh = res ? JSON.parse(res.value) : { locked:false, items:[] };
+        if(JSON.stringify(fresh) !== JSON.stringify(currentData)){ currentData = fresh; render(); }
+        const rRes = await window.storage.get("roster", true);
+        const fRoster = rRes ? JSON.parse(rRes.value) : [];
+        if(JSON.stringify(fRoster) !== JSON.stringify(roster)){ roster = fRoster; renderRoster(); }
+      }catch(e){}
+    }, 8000);
+  }
+
+  Promise.all([loadRoster(), loadOrders()]).then(()=>{ updatePricePreview(); startPolling(); });
+})();
+</script>
+</body>
+</html>
